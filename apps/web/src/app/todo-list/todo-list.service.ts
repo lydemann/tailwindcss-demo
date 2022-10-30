@@ -49,13 +49,26 @@ export class TodoListService {
     });
   }
 
-  saveTodo(todoItem: TodoItem) {
-    if (todoItem.id) {
+  saveTodo(todoItemToSave: TodoItem) {
+    if (todoItemToSave.id) {
       // update
+
+      const updatedTodoList = this.state.value.todoItems.map(todoItem => {
+
+        if(todoItem.id === todoItemToSave.id) {
+          return todoItemToSave
+        }
+        return todoItem;
+      })
+
+      this.state.next({
+        ...this.state.value,
+        todoItems: [...updatedTodoList],
+      });
     } else {
       // create
       const newTodoItem = {
-        ...todoItem,
+        ...todoItemToSave,
         id: (this.state.value.todoItems.length + 1).toString(),
       } as TodoItem;
       this.state.next({

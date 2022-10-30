@@ -23,6 +23,7 @@ import { SharedModule } from '../shared/shared.module';
         *ngFor="let todoItem of todoItems$ | async; trackBy: todoItemsTrackBy"
         [todoItem]="todoItem"
         (delete)="onDeleteTodo($event)"
+        (edit)="onEdit($event)"
       >
       </app-todo-item>
     </div>
@@ -33,7 +34,7 @@ import { SharedModule } from '../shared/shared.module';
         <input matInput type="text" formControlName="name" />
       </mat-form-field>
 
-      <button mat-button color="primary" type="submit">Save</button>
+      <button mat-button color="primary" [disabled]="formGroup.invalid" type="submit">Save</button>
     </form>
   `,
   styles: [
@@ -45,11 +46,12 @@ import { SharedModule } from '../shared/shared.module';
   ],
 })
 export class TodoListComponent {
+  selectedTodo!: TodoItem | null;
   todoItems$: Observable<TodoItem[]>;
   formGroup: FormGroup<{
     id: FormControl<string | null>;
     name: FormControl<string | null>;
-    isCompleted: FormControl<string | null>;
+    isCompleted: FormControl<boolean | null>;
   }>;
 
   constructor(private todoListService: TodoListService) {
@@ -58,7 +60,7 @@ export class TodoListComponent {
     this.formGroup = new FormGroup({
       id: new FormControl(''),
       name: new FormControl('', Validators.required),
-      isCompleted: new FormControl('', Validators.required),
+      isCompleted: new FormControl(false, Validators.required),
     });
   }
 
@@ -66,12 +68,22 @@ export class TodoListComponent {
     this.todoListService.deleteTodo(todoItemId);
   }
 
+  onEdit(todoItem: TodoItem) {
+    this.selectedTodo = todoItem;
+
+    this.formGroup.setValue(this.selectedTodo);
+  }
+
   onSaveTodo() {
     const todoItem = {
+      ...this.selectedTodo,
       name: this.formGroup.value.name,
     } as TodoItem;
 
     this.todoListService.saveTodo(todoItem);
+
+    this.selectedTodo = null;
+    this.formGroup.reset();
   }
 
   todoItemsTrackBy: TrackByFunction<TodoItem> = (idx, item) => {
