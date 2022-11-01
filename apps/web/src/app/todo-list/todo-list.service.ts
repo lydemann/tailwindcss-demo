@@ -69,7 +69,7 @@ export class TodoListService {
       // create
       const newTodoItem = {
         ...todoItemToSave,
-        id: (this.state.value.todoItems.length + 1).toString(),
+        id: crypto.randomUUID(),
       } as TodoItem;
       this.state.next({
         ...this.state.value,
