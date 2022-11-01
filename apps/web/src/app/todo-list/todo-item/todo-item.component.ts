@@ -1,6 +1,12 @@
-import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  Output,
+} from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Subject, takeUntil } from 'rxjs';
 import { SharedModule } from '../../shared/shared.module';
 import { TodoItem } from '../todo-list.service';
 
@@ -10,9 +16,10 @@ import { TodoItem } from '../todo-list.service';
   imports: [SharedModule, ReactiveFormsModule],
   template: ` <mat-card>
     <div class="flex justify-between items-center gap-4">
-      <div>{{ todoItem?.name }}</div>
+      <div [class.line-through]="todoItem?.isCompleted">{{ todoItem?.name }}</div>
       <div>
-        <mat-checkbox color="primary"> </mat-checkbox>
+        <mat-checkbox color="primary" [formControl]="isCompleteFormControl">
+        </mat-checkbox>
         <button mat-icon-button (click)="onDelete()">
           <mat-icon color="warn" fontIcon="delete"> </mat-icon>
         </button>
@@ -30,10 +37,32 @@ import { TodoItem } from '../todo-list.service';
     `,
   ],
 })
-export class TodoItemComponent {
+export class TodoItemComponent implements OnDestroy {
   @Input() todoItem: TodoItem | undefined;
+  @Output() isCompleteChange = new EventEmitter<TodoItem>();
   @Output() delete = new EventEmitter<string>();
   @Output() edit = new EventEmitter<TodoItem>();
+
+  destroy = new Subject<void>();
+  isCompleteFormControl = new FormControl<boolean>(false);
+
+  constructor() {
+    this.isCompleteFormControl.valueChanges
+      .pipe(takeUntil(this.destroy))
+      .subscribe((value) => {
+        if (value !== null) {
+          this.isCompleteChange.next({
+            ...this.todoItem,
+            isCompleted: value,
+          } as TodoItem);
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy.next();
+    this.destroy.complete();
+  }
 
   onDelete() {
     this.delete.emit(this.todoItem?.id);

@@ -23,6 +23,7 @@ import { SharedModule } from '../shared/shared.module';
         [todoItem]="todoItem"
         (delete)="onDeleteTodo($event)"
         (edit)="onEdit($event)"
+        (isCompleteChange)="onComplete($event)"
       >
       </app-todo-item>
     </div>
@@ -78,6 +79,10 @@ export class TodoListComponent {
     this.selectedTodo = todoItem;
 
     this.formGroup.setValue(this.selectedTodo);
+  }
+
+  onComplete(todoItem: TodoItem) {
+    this.todoListService.saveTodo(todoItem);
   }
 
   onSaveTodo() {
