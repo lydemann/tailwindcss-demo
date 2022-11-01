@@ -18,12 +18,14 @@ import { SharedModule } from '../shared/shared.module';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TodoItemComponent, SharedModule],
   template: `
-    <div class="block mb-2">
+    <div class="block mb-6">
       <app-todo-item
+        class="mb-1"
         *ngFor="let todoItem of todoItems$ | async; trackBy: todoItemsTrackBy"
         [todoItem]="todoItem"
         (delete)="onDeleteTodo($event)"
         (edit)="onEdit($event)"
+        (isCompletedChange)="onIsCompletedChange($event)"
       >
       </app-todo-item>
     </div>
@@ -34,7 +36,14 @@ import { SharedModule } from '../shared/shared.module';
         <input matInput type="text" formControlName="name" />
       </mat-form-field>
 
-      <button mat-button color="primary" [disabled]="formGroup.invalid" type="submit">Save</button>
+      <button
+        mat-button
+        color="primary"
+        [disabled]="formGroup.invalid"
+        type="submit"
+      >
+        Save
+      </button>
     </form>
   `,
   styles: [
@@ -66,6 +75,10 @@ export class TodoListComponent {
 
   onDeleteTodo(todoItemId: string) {
     this.todoListService.deleteTodo(todoItemId);
+  }
+
+  onIsCompletedChange(todoItem: TodoItem) {
+    this.todoListService.saveTodo(todoItem);
   }
 
   onEdit(todoItem: TodoItem) {
