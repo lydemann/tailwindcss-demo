@@ -58,18 +58,14 @@ export class TodoListComponent {
   selectedTodo!: TodoItem | null;
   todoItems$: Observable<TodoItem[]>;
   formGroup: FormGroup<{
-    id: FormControl<string | null>;
     name: FormControl<string | null>;
-    isCompleted: FormControl<boolean | null>;
   }>;
 
   constructor(private todoListService: TodoListService) {
     this.todoItems$ = todoListService.todoItems$;
 
     this.formGroup = new FormGroup({
-      id: new FormControl(''),
       name: new FormControl('', Validators.required),
-      isCompleted: new FormControl(false, Validators.required),
     });
   }
 
@@ -84,7 +80,9 @@ export class TodoListComponent {
   onEdit(todoItem: TodoItem) {
     this.selectedTodo = todoItem;
 
-    this.formGroup.setValue(this.selectedTodo);
+    this.formGroup.setValue({
+      name: this.selectedTodo.name,
+    });
   }
 
   onSaveTodo() {
