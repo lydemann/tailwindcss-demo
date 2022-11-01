@@ -4,3 +4,9 @@
 @tailwind utilities;
 
 @import './theme/theme.scss';
+
+body {
+    display: block;
+    margin: 0 auto;
+    background: #f9fafb;
+}

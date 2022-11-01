@@ -2,10 +2,8 @@ import { Component, TrackByFunction } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TodoItemComponent } from './todo-item/todo-item.component';
 import { TodoItem, TodoListService } from './todo-list.service';
-import { map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
-  FormArray,
-  FormBuilder,
   FormControl,
   FormGroup,
   ReactiveFormsModule,
@@ -18,8 +16,9 @@ import { SharedModule } from '../shared/shared.module';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, TodoItemComponent, SharedModule],
   template: `
-    <div class="block mb-2">
+    <div class="block mb-6">
       <app-todo-item
+        class="mb-1"
         *ngFor="let todoItem of todoItems$ | async; trackBy: todoItemsTrackBy"
         [todoItem]="todoItem"
         (delete)="onDeleteTodo($event)"
@@ -34,7 +33,14 @@ import { SharedModule } from '../shared/shared.module';
         <input matInput type="text" formControlName="name" />
       </mat-form-field>
 
-      <button mat-button color="primary" [disabled]="formGroup.invalid" type="submit">Save</button>
+      <button
+        mat-button
+        color="primary"
+        [disabled]="formGroup.invalid"
+        type="submit"
+      >
+        Save
+      </button>
     </form>
   `,
   styles: [
